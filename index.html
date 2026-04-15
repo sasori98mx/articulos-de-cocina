@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Cocina Premium</title>
+    <style>
+        :root {
+            --primary: #c62828;
+            --primary-dark: #8e0000;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #212121;
+            --text-light: #616161;
+            --success: #2e7d32;
+            --border: #e0e0e0;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --radius: 10px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text); line-height: 1.5; }
+        
+        header {
+            background: var(--primary); color: white; padding: 1rem; text-align: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        header h1 { font-size: 1.4rem; margin: 0; }
+        header p { font-size: 0.9rem; opacity: 0.9; margin-top: 4px; }
+        
+        .category-filters {
+            display: flex; gap: 8px; padding: 1rem; overflow-x: auto;
+            background: white; border-bottom: 1px solid var(--border);
+            position: sticky; top: 70px; z-index: 99;
+        }
+        .cat-filter-btn {
+            padding: 8px 16px; border: 1px solid var(--border); border-radius: 20px;
+            background: white; cursor: pointer; white-space: nowrap; font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .cat-filter-btn:hover { background: var(--bg); }
+        .cat-filter-btn.active {
+            background: var(--primary); color: white; border-color: var(--primary);
+        }
+
+        .catalog {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;
+            padding: 1.5rem; max-width: 1200px; margin: 0 auto;
+        }
+        .card { 
+            background: white; border-radius: var(--radius); overflow: hidden; 
+            box-shadow: var(--shadow); transition: 0.2s; display: flex; flex-direction: column; 
+        }
+        .card:hover { transform: translateY(-4px); }
+        .card-img-wrap { 
+            position: relative; height: 220px; background: #eee; cursor: pointer; 
+        }
+        .card-img-wrap img { 
+            width: 100%; height: 100%; object-fit: cover; 
+        }
+        .img-counter { 
+            position: absolute; bottom: 8px; right: 8px; 
+            background: rgba(0,0,0,0.7); color: white; 
+            padding: 3px 8px; border-radius: 15px; font-size: 0.8rem; 
+        }
+        .card-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+        .card-category { 
+            font-size: 0.75rem; color: var(--primary); font-weight: 600; 
+            text-transform: uppercase; margin-bottom: 5px; 
+        }
+        .card-price { 
+            font-size: 1.3rem; font-weight: bold; color: var(--success); 
+            margin: 10px 0; 
+        }
+        .card-actions { display: flex; gap: 8px; margin-top: auto; }
+        .card-actions .btn { 
+            flex: 1; padding: 10px; border: none; border-radius: 6px; 
+            font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.95rem; 
+        }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #1b5e20; }
+
+        .gallery-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 2000; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .gallery-modal.active { display: flex; }
+        .gallery-img { max-width: 95%; max-height: 70vh; object-fit: contain; border-radius: 8px; }
+        .gallery-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.2); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%; font-size: 2rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .gallery-nav:hover { background: rgba(255,255,255,0.4); }
+        .gallery-prev { left: 20px; }
+        .gallery-next { right: 20px; }
+        .gallery-close {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .gallery-counter {
+            color: white; margin-top: 15px; font-size: 1rem;
+            background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 20px;
+        }
+        .gallery-thumbs {
+            display: flex; gap: 10px; margin-top: 15px; overflow-x: auto;
+            max-width: 90%; padding: 5px;
+        }
+        .gallery-thumbs img {
+            width: 60px; height: 60px; object-fit: cover; border-radius: 6px;
+            cursor: pointer; border: 3px solid transparent; opacity: 0.6;
+            transition: 0.2s;
+        }
+        .gallery-thumbs img.active {
+            border-color: var(--primary); opacity: 1; transform: scale(1.1);
+        }
+
+        @media (max-width: 600px) {
+            .catalog { grid-template-columns: 1fr; padding: 1rem; }
+            .category-filters { top: 60px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🍳 Catálogo Cocina Premium</h1>
+        <p>Explora nuestros productos y contáctanos por WhatsApp</p>
+    </header>
+
+    <div id="category-filters" class="category-filters"></div>
+    <div id="catalog" class="catalog"></div>
+    
+    <div id="gallery" class="gallery-modal">
+        <button class="gallery-close" onclick="closeGallery()">×</button>
+        <button class="gallery-nav gallery-prev" onclick="navImg(-1)">❮</button>
+        <img id="gal-img" class="gallery-img" src="">
+        <button class="gallery-nav gallery-next" onclick="navImg(1)">❯</button>
+        <div class="gallery-counter" id="gal-counter">1 / 5</div>
+        <div class="gallery-thumbs" id="gal-thumbs"></div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURACIÓN (EDITAR AQUÍ) ====================
+        const CONFIG = {
+            whatsapp: "7757076561", // ← TU NÚMERO DE WHATSAPP AQUÍ
+            activeCategories: [
+                "Ollas/Vaporeras", "Sartenes", "Vasos", "Vajillas", 
+                "Electrodomesticos", "Utensilios", "Cubiertos", "Accesorios"
+            ]
+        };
+
+        // ==================== CATEGORÍAS DISPONIBLES ====================
+        const CATEGORIES = [
+            { id: "Ollas/Vaporeras", label: "🍲 Ollas/Vaporeras" },
+            { id: "Sartenes", label: "🍳 Sartenes" },
+            { id: "Vasos", label: "🥛 Vasos" },
+            { id: "Vajillas", label: "🍽️ Vajillas" },
+            { id: "Electrodomesticos", label: "⚡ Electrodomésticos" },
+            { id: "Utensilios", label: "🔪 Utensilios" },
+            { id: "Cubiertos", label: "🍴 Cubiertos" },
+            { id: "Accesorios", label: "🎁 Accesorios" }
+        ];
+
+        // ==================== ✏️ ZONA DE EDICIÓN DE PRODUCTOS (1-100) ====================
+        // Para AGREGAR o EDITAR productos:
+        // 1. enabled: true = se muestra | false = se oculta
+        // 2. category: debe coincidir EXACTAMENTE con el 'id' de CATEGORIES (ej: "Ollas")
+        // 3. price: formato "999.99" (sin símbolo $)
+        // 4. images: rutas de imágenes en carpeta "images/"
+        //    Ej: "images/producto1-foto1.jpg"
+        // ============================================================================
+
+        const PRODUCTS = [
+            {
+                id: "1",
+                enabled: true,
+                category: "Ollas/Vaporeras",
+                name: "OLLA RECTA ALTA 22 CM CINSA",
+                price: "380.00",
+                desc: "INCLUYE UNA TAPA DE CRISTAL, PERFCTTA PARA TUS COMIDAS.",
+                images: [
+                    "images/producto1-foto1.jpg",
+                    "images/producto1-foto2.jpg",
+                    "images/producto1-foto3.jpg",
+                    "images/producto1-foto4.jpg"
+                ]
+            },
+            {
+                id: "2",
+                enabled: true,
+                category: "Sartenes",
+                name: "Sartén Antiadherente 28cm",
+                price: "459.00",
+                desc: "Recubrimiento cerámico libre de PFOA. Apto para todo tipo de estufas.",
+                images: [
+                    "images/producto2-foto1.jpg",
+                    "images/producto2-foto2.jpg"
+                ]
+            },
+            {
+                id: "3",
+                enabled: true,
+                category: "Vasos",
+                name: "Juego de 6 Vasos de Cristal",
+                price: "299.00",
+                desc: "Cristal templado resistente. Capacidad 350ml cada uno.",
+                images: ["images/producto3-foto1.jpg"]
+            },
+            {
+                id: "4",
+                enabled: true,
+                category: "Vajillas",
+                name: "Vajilla Porcelana 12 piezas",
+                price: "1299.00",
+                desc: "Elegante diseño blanco con detalles dorados. Apta para microondas.",
+                images: [
+                    "images/producto4-foto1.jpg",
+                    "images/producto4-foto2.jpg",
+                    "images/producto4-foto3.jpg",
+                    "images/producto4-foto4.jpg"
+                ]
+            },
+            {
+                id: "5",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Licuadora Profesional 1200W",
+                price: "1899.00",
+                desc: "Motor potente con 5 velocidades. Jarra de vidrio templado 2L.",
+                images: ["images/producto5-foto1.jpg", "images/producto5-foto2.jpg"]
+            },
+            {
+                id: "6",
+                enabled: true,
+                category: "Utensilios",
+                name: "Set de Cuchillos Chef 5 piezas",
+                price: "749.00",
+                desc: "Acero inoxidable de alta calidad. Incluye bloque de madera.",
+                images: ["images/producto6-foto1.jpg"]
+            },
+            {
+                id: "7",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Cubertería Inoxidable 24 piezas",
+                price: "599.00",
+                desc: "Acabado espejo. Incluye 6 tenedores, 6 cucharas, 6 cuchillos y 6 postres.",
+                images: ["images/producto7-foto1.jpg", "images/producto7-foto2.jpg"]
+            },
+            {
+                id: "8",
+                enabled: true,
+                category: "Accesorios",
+                name: "Delantal de Cocina Premium",
+                price: "199.00",
+                desc: "Algodón resistente con bolsillos. Talla única ajustable.",
+                images: ["images/producto8-foto1.jpg"]
+            },
+            {
+                id: "9",
+                enabled: true,
+                category: "Ollas",
+                name: "Olla Express 6L",
+                price: "1199.00",
+                desc: "Cocción rápida y segura. Válvula de seguridad certificada.",
+                images: ["images/producto9-foto1.jpg", "images/producto9-foto2.jpg", "images/producto9-foto3.jpg"]
+            },
+            {
+                id: "10",
+                enabled: true,
+                category: "Sartenes",
+                name: "Wok Antiadherente 32cm",
+                price: "649.00",
+                desc: "Perfecto para salteados asiáticos. Mango ergonómico resistente al calor.",
+                images: ["images/producto10-foto1.jpg", "images/producto10-foto2.jpg"]
+            },
+            {
+                id: "11",
+                enabled: true,
+                category: "cacerolas",
+                name: "pura cocina perrona",
+                price: "45555555.00",
+                desc: "No se mostrará",
+                images: []
+            },
+            {
+                id: "12",
+                enabled: true,
+                category: "Vasos",
+                name: "Vaso Térmico 500ml",
+                price: "150.00",
+                desc: "Mantiene frío/calor por horas",
+                images: ["images/producto12-foto1.jpg"]
+            },
+            {
+                id: "13",
+                enabled: true,
+                category: "Vasos",
+                name: "Producto 13",
+                price: "0.00",
+                desc: "Descripción del producto 13",
+                images: []
+            },
+            {
+                id: "14",
+                enabled: true,
+                category: "Vajillas",
+                name: "Producto 14",
+                price: "0.00",
+                desc: "Descripción del producto 14",
+                images: []
+            },
+            {
+                id: "15",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Producto 15",
+                price: "0.00",
+                desc: "Descripción del producto 15",
+                images: []
+            },
+            {
+                id: "16",
+                enabled: true,
+                category: "Utensilios",
+                name: "Producto 16",
+                price: "0.00",
+                desc: "Descripción del producto 16",
+                images: []
+            },
+            {
+                id: "17",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Producto 17",
+                price: "0.00",
+                desc: "Descripción del producto 17",
+                images: []
+            },
+            {
+                id: "18",
+                enabled: true,
+                category: "Accesorios",
+                name: "Producto 18",
+                price: "0.00",
+                desc: "Descripción del producto 18",
+                images: []
+            },
+            {
+                id: "19",
+                enabled: true,
+                category: "Ollas",
+                name: "Producto 19",
+                price: "0.00",
+                desc: "Descripción del producto 19",
+                images: []
+            },
+            {
+                id: "20",
+                enabled: true,
+                category: "Sartenes",
+                name: "Producto 20",
+                price: "0.00",
+                desc: "Descripción del producto 20",
+                images: []
+            },
+            {
+                id: "21",
+                enabled: true,
+                category: "Vasos",
+                name: "Producto 21",
+                price: "0.00",
+                desc: "Descripción del producto 21",
+                images: []
+            },
+            {
+                id: "22",
+                enabled: true,
+                category: "Vajillas",
+                name: "Producto 22",
+                price: "0.00",
+                desc: "Descripción del producto 22",
+                images: []
+            },
+            {
+                id: "23",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Producto 23",
+                price: "0.00",
+                desc: "Descripción del producto 23",
+                images: []
+            },
+            {
+                id: "24",
+                enabled: true,
+                category: "Utensilios",
+                name: "Producto 24",
+                price: "0.00",
+                desc: "Descripción del producto 24",
+                images: []
+            },
+            {
+                id: "25",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Producto 25",
+                price: "0.00",
+                desc: "Descripción del producto 25",
+                images: []
+            },
+            {
+                id: "26",
+                enabled: true,
+                category: "Accesorios",
+                name: "Producto 26",
+                price: "0.00",
+                desc: "Descripción del producto 26",
+                images: []
+            },
+            {
+                id: "27",
+                enabled: true,
+                category: "Ollas",
+                name: "Producto 27",
+                price: "0.00",
+                desc: "Descripción del producto 27",
+                images: []
+            },
+            {
+                id: "28",
+                enabled: true,
+                category: "Sartenes",
+                name: "Producto 28",
+                price: "0.00",
+                desc: "Descripción del producto 28",
+                images: []
+            },
+            {
+                id: "29",
+                enabled: true,
+                category: "Vasos",
+                name: "Producto 29",
+                price: "0.00",
+                desc: "Descripción del producto 29",
+                images: []
+            },
+            {
+                id: "30",
+                enabled: true,
+                category: "Vajillas",
+                name: "Producto 30",
+                price: "0.00",
+                desc: "Descripción del producto 30",
+                images: []
+            },
+            {
+                id: "31",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Producto 31",
+                price: "0.00",
+                desc: "Descripción del producto 31",
+                images: []
+            },
+            {
+                id: "32",
+                enabled: true,
+                category: "Utensilios",
+                name: "Producto 32",
+                price: "0.00",
+                desc: "Descripción del producto 32",
+                images: []
+            },
+            {
+                id: "33",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Producto 33",
+                price: "0.00",
+                desc: "Descripción del producto 33",
+                images: []
+            },
+            {
+                id: "34",
+                enabled: true,
+                category: "Accesorios",
+                name: "Producto 34",
+                price: "0.00",
+                desc: "Descripción del producto 34",
+                images: []
+            },
+            {
+                id: "35",
+                enabled: true,
+                category: "Ollas",
+                name: "Producto 35",
+                price: "0.00",
+                desc: "Descripción del producto 35",
+                images: []
+            },
+            {
+                id: "36",
+                enabled: true,
+                category: "Sartenes",
+                name: "Producto 36",
+                price: "0.00",
+                desc: "Descripción del producto 36",
+                images: []
+            },
+            {
+                id: "37",
+                enabled: true,
+                category: "Vasos",
+                name: "Producto 37",
+                price: "0.00",
+                desc: "Descripción del producto 37",
+                images: []
+            },
+            {
+                id: "38",
+                enabled: true,
+                category: "Vajillas",
+                name: "Producto 38",
+                price: "0.00",
+                desc: "Descripción del producto 38",
+                images: []
+            },
+            {
+                id: "39",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Producto 39",
+                price: "0.00",
+                desc: "Descripción del producto 39",
+                images: []
+            },
+            {
+                id: "40",
+                enabled: true,
+                category: "Utensilios",
+                name: "Producto 40",
+                price: "0.00",
+                desc: "Descripción del producto 40",
+                images: []
+            },
+            {
+                id: "41",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Producto 41",
+                price: "0.00",
+                desc: "Descripción del producto 41",
+                images: []
+            },
+            {
+                id: "42",
+                enabled: true,
+                category: "Accesorios",
+                name: "Producto 42",
+                price: "0.00",
+                desc: "Descripción del producto 42",
+                images: []
+            },
+            {
+                id: "43",
+                enabled: true,
+                category: "Ollas",
+                name: "Producto 43",
+                price: "0.00",
+                desc: "Descripción del producto 43",
+                images: []
+            },
+            {
+                id: "44",
+                enabled: true,
+                category: "Sartenes",
+                name: "Producto 44",
+                price: "0.00",
+                desc: "Descripción del producto 44",
+                images: []
+            },
+            {
+                id: "45",
+                enabled: true,
+                category: "Vasos",
+                name: "Producto 45",
+                price: "0.00",
+                desc: "Descripción del producto 45",
+                images: []
+            },
+            {
+                id: "46",
+                enabled: true,
+                category: "Vajillas",
+                name: "Producto 46",
+                price: "0.00",
+                desc: "Descripción del producto 46",
+                images: []
+            },
+            {
+                id: "47",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Producto 47",
+                price: "0.00",
+                desc: "Descripción del producto 47",
+                images: []
+            },
+            {
+                id: "48",
+                enabled: true,
+                category: "Utensilios",
+                name: "Producto 48",
+                price: "0.00",
+                desc: "Descripción del producto 48",
+                images: []
+            },
+            {
+                id: "49",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Producto 49",
+                price: "0.00",
+                desc: "Descripción del producto 49",
+                images: []
+            },
+            {
+                id: "50",
+                enabled: true,
+                category: "Accesorios",
+                name: "Producto 50",
+                price: "0.00",
+                desc: "Descripción del producto 50",
+                images: []
+            },
+            {
+                id: "51",
+                enabled: true,
+                category: "Ollas",
+                name: "Producto 51",
+                price: "0.00",
+                desc: "Descripción del producto 51",
+                images: []
+            },
+            {
+                id: "52",
+                enabled: true,
+                category: "Sartenes",
+                name: "Producto 52",
+                price: "0.00",
+                desc: "Descripción del producto 52",
+                images: []
+            },
+            {
+                id: "53",
+                enabled: true,
+                category: "Vasos",
+                name: "Producto 53",
+                price: "0.00",
+                desc: "Descripción del producto 53",
+                images: []
+            },
+            {
+                id: "54",
+                enabled: true,
+                category: "Vajillas",
+                name: "Producto 54",
+                price: "0.00",
+                desc: "Descripción del producto 54",
+                images: []
+            },
+            {
+                id: "55",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Producto 55",
+                price: "0.00",
+                desc: "Descripción del producto 55",
+                images: []
+            },
+            {
+                id: "56",
+                enabled: true,
+                category: "Utensilios",
+                name: "Producto 56",
+                price: "0.00",
+                desc: "Descripción del producto 56",
+                images: []
+            },
+            {
+                id: "57",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Producto 57",
+                price: "0.00",
+                desc: "Descripción del producto 57",
+                images: []
+            },
+            {
+                id: "58",
+                enabled: true,
+                category: "Accesorios",
+                name: "Producto 58",
+                price: "0.00",
+                desc: "Descripción del producto 58",
+                images: []
+            },
+            {
+                id: "59",
+                enabled: true,
+                category: "Ollas",
+                name: "Producto 59",
+                price: "0.00",
+                desc: "Descripción del producto 59",
+                images: []
+            },
+            {
+                id: "60",
+                enabled: true,
+                category: "Sartenes",
+                name: "Producto 60",
+                price: "0.00",
+                desc: "Descripción del producto 60",
+                images: []
+            },
+            {
+                id: "61",
+                enabled: true,
+                category: "Vasos",
+                name: "Producto 61",
+                price: "0.00",
+                desc: "Descripción del producto 61",
+                images: []
+            },
+            {
+                id: "62",
+                enabled: true,
+                category: "Vajillas",
+                name: "Producto 62",
+                price: "0.00",
+                desc: "Descripción del producto 62",
+                images: []
+            },
+            {
+                id: "63",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Producto 63",
+                price: "0.00",
+                desc: "Descripción del producto 63",
+                images: []
+            },
+            {
+                id: "64",
+                enabled: true,
+                category: "Utensilios",
+                name: "Producto 64",
+                price: "0.00",
+                desc: "Descripción del producto 64",
+                images: []
+            },
+            {
+                id: "65",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Producto 65",
+                price: "0.00",
+                desc: "Descripción del producto 65",
+                images: []
+            },
+            {
+                id: "66",
+                enabled: true,
+                category: "Accesorios",
+                name: "Producto 66",
+                price: "0.00",
+                desc: "Descripción del producto 66",
+                images: []
+            },
+            {
+                id: "67",
+                enabled: true,
+                category: "Ollas",
+                name: "Producto 67",
+                price: "0.00",
+                desc: "Descripción del producto 67",
+                images: []
+            },
+            {
+                id: "68",
+                enabled: true,
+                category: "Sartenes",
+                name: "Producto 68",
+                price: "0.00",
+                desc: "Descripción del producto 68",
+                images: []
+            },
+            {
+                id: "69",
+                enabled: true,
+                category: "Vasos",
+                name: "Producto 69",
+                price: "0.00",
+                desc: "Descripción del producto 69",
+                images: []
+            },
+            {
+                id: "70",
+                enabled: true,
+                category: "Vajillas",
+                name: "Producto 70",
+                price: "0.00",
+                desc: "Descripción del producto 70",
+                images: []
+            },
+            {
+                id: "71",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Producto 71",
+                price: "0.00",
+                desc: "Descripción del producto 71",
+                images: []
+            },
+            {
+                id: "72",
+                enabled: true,
+                category: "Utensilios",
+                name: "Producto 72",
+                price: "0.00",
+                desc: "Descripción del producto 72",
+                images: []
+            },
+            {
+                id: "73",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Producto 73",
+                price: "0.00",
+                desc: "Descripción del producto 73",
+                images: []
+            },
+            {
+                id: "74",
+                enabled: true,
+                category: "Accesorios",
+                name: "Producto 74",
+                price: "0.00",
+                desc: "Descripción del producto 74",
+                images: []
+            },
+            {
+                id: "75",
+                enabled: true,
+                category: "Ollas",
+                name: "Producto 75",
+                price: "0.00",
+                desc: "Descripción del producto 75",
+                images: []
+            },
+            {
+                id: "76",
+                enabled: true,
+                category: "Sartenes",
+                name: "Producto 76",
+                price: "0.00",
+                desc: "Descripción del producto 76",
+                images: []
+            },
+            {
+                id: "77",
+                enabled: true,
+                category: "Vasos",
+                name: "Producto 77",
+                price: "0.00",
+                desc: "Descripción del producto 77",
+                images: []
+            },
+            {
+                id: "78",
+                enabled: true,
+                category: "Vajillas",
+                name: "Producto 78",
+                price: "0.00",
+                desc: "Descripción del producto 78",
+                images: []
+            },
+            {
+                id: "79",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Producto 79",
+                price: "0.00",
+                desc: "Descripción del producto 79",
+                images: []
+            },
+            {
+                id: "80",
+                enabled: true,
+                category: "Utensilios",
+                name: "Producto 80",
+                price: "0.00",
+                desc: "Descripción del producto 80",
+                images: []
+            },
+            {
+                id: "81",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Producto 81",
+                price: "0.00",
+                desc: "Descripción del producto 81",
+                images: []
+            },
+            {
+                id: "82",
+                enabled: true,
+                category: "Accesorios",
+                name: "Producto 82",
+                price: "0.00",
+                desc: "Descripción del producto 82",
+                images: []
+            },
+            {
+                id: "83",
+                enabled: true,
+                category: "Ollas",
+                name: "Producto 83",
+                price: "0.00",
+                desc: "Descripción del producto 83",
+                images: []
+            },
+            {
+                id: "84",
+                enabled: true,
+                category: "Sartenes",
+                name: "Producto 84",
+                price: "0.00",
+                desc: "Descripción del producto 84",
+                images: []
+            },
+            {
+                id: "85",
+                enabled: true,
+                category: "Vasos",
+                name: "Producto 85",
+                price: "0.00",
+                desc: "Descripción del producto 85",
+                images: []
+            },
+            {
+                id: "86",
+                enabled: true,
+                category: "Vajillas",
+                name: "Producto 86",
+                price: "0.00",
+                desc: "Descripción del producto 86",
+                images: []
+            },
+            {
+                id: "87",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Producto 87",
+                price: "0.00",
+                desc: "Descripción del producto 87",
+                images: []
+            },
+            {
+                id: "88",
+                enabled: true,
+                category: "Utensilios",
+                name: "Producto 88",
+                price: "0.00",
+                desc: "Descripción del producto 88",
+                images: []
+            },
+            {
+                id: "89",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Producto 89",
+                price: "0.00",
+                desc: "Descripción del producto 89",
+                images: []
+            },
+            {
+                id: "90",
+                enabled: true,
+                category: "Accesorios",
+                name: "Producto 90",
+                price: "0.00",
+                desc: "Descripción del producto 90",
+                images: []
+            },
+            {
+                id: "91",
+                enabled: true,
+                category: "Ollas",
+                name: "Producto 91",
+                price: "0.00",
+                desc: "Descripción del producto 91",
+                images: []
+            },
+            {
+                id: "92",
+                enabled: true,
+                category: "Sartenes",
+                name: "Producto 92",
+                price: "0.00",
+                desc: "Descripción del producto 92",
+                images: []
+            },
+            {
+                id: "93",
+                enabled: true,
+                category: "Vasos",
+                name: "Producto 93",
+                price: "0.00",
+                desc: "Descripción del producto 93",
+                images: []
+            },
+            {
+                id: "94",
+                enabled: true,
+                category: "Vajillas",
+                name: "Producto 94",
+                price: "0.00",
+                desc: "Descripción del producto 94",
+                images: []
+            },
+            {
+                id: "95",
+                enabled: true,
+                category: "Electrodomesticos",
+                name: "Producto 95",
+                price: "0.00",
+                desc: "Descripción del producto 95",
+                images: []
+            },
+            {
+                id: "96",
+                enabled: true,
+                category: "Utensilios",
+                name: "Producto 96",
+                price: "0.00",
+                desc: "Descripción del producto 96",
+                images: []
+            },
+            {
+                id: "97",
+                enabled: true,
+                category: "Cubiertos",
+                name: "Producto 97",
+                price: "0.00",
+                desc: "Descripción del producto 97",
+                images: []
+            },
+            {
+                id: "98",
+                enabled: true,
+                category: "Accesorios",
+                name: "Producto 98",
+                price: "0.00",
+                desc: "Descripción del producto 98",
+                images: []
+            },
+            {
+                id: "99",
+                enabled: true,
+                category: "Ollas",
+                name: "Producto 99",
+                price: "0.00",
+                desc: "Descripción del producto 99",
+                images: []
+            },
+            {
+                id: "100",
+                enabled: true,
+                category: "Sartenes",
+                name: "Producto 100",
+                price: "0.00",
+                desc: "Descripción del producto 100",
+                images: []
+            }
+        ];
+
+        // ==================== LÓGICA DEL CATÁLOGO ====================
+        let currentFilter = "Todas";
+        let galImages = [], galIdx = 0;
+
+        function getCategoryById(id) {
+            return CATEGORIES.find(c => c.id === id);
+        }
+
+        function renderCategoryFilters() {
+            const container = document.getElementById("category-filters");
+            container.innerHTML = "";
+            
+            const allBtn = document.createElement("button");
+            allBtn.className = "cat-filter-btn" + (currentFilter === "Todas" ? " active" : "");
+            allBtn.textContent = "📦 Todas";
+            allBtn.onclick = () => setFilter("Todas");
+            container.appendChild(allBtn);
+            
+            CONFIG.activeCategories.forEach(catId => {
+                const cat = getCategoryById(catId);
+                if (!cat) return;
+                const btn = document.createElement("button");
+                btn.className = "cat-filter-btn" + (currentFilter === catId ? " active" : "");
+                btn.textContent = cat.label;
+                btn.onclick = () => setFilter(catId);
+                container.appendChild(btn);
+            });
+        }
+
+        function setFilter(cat) {
+            currentFilter = cat;
+            renderCategoryFilters();
+            renderCatalog();
+        }
+
+        function renderCatalog() {
+            const cont = document.getElementById("catalog");
+            cont.innerHTML = "";
+            
+            let filtered = PRODUCTS.filter(p => {
+                if (p.enabled === false) return false;
+                if (!CONFIG.activeCategories.includes(p.category)) return false;
+                if (currentFilter !== "Todas" && p.category !== currentFilter) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                cont.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:#666; padding:2rem;">🛍️ Pronto tendremos productos en esta categoría</p>`;
+                return;
+            }
+
+            filtered.forEach(p => {
+                const cat = getCategoryById(p.category);
+                let imgs = (p.images || []).filter(img => img && img.trim() !== "");
+                if (imgs.length === 0) imgs = ["images/placeholder.jpg"];
+                
+                cont.innerHTML += `
+                    <div class="card">
+                        <div class="card-img-wrap" onclick="openGallery('${p.id}')">
+                            <img src="${imgs[0]}" alt="${p.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjOTk5Ij5TaW4gSW1hZ2VuPC90ZXh0Pjwvc3ZnPg=='">
+                            ${imgs.length > 1 ? `<div class="img-counter">📷 ${imgs.length}</div>` : ''}
+                        </div>
+                        <div class="card-body">
+                            <div class="card-category">${cat ? cat.label : p.category}</div>
+                            <div style="font-weight:600; margin-bottom:5px;">${p.name || 'Sin nombre'}</div>
+                            <div style="font-size:0.9rem; color:#666; flex:1;">${p.desc || ""}</div>
+                            <div class="card-price">$${Number(p.price || 0).toFixed(2)}</div>
+                            <div class="card-actions">
+                                <button class="btn btn-success" onclick="contactWA('${(p.name || 'Producto').replace(/'/g, "\\'")}', '${p.price || '0'}')">📲 Consultar por WhatsApp</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function contactWA(n, p) {
+            const msg = `Hola, me interesa: *${n}* ($${p}). ¿Disponible?`;
+            window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
+        }
+
+        function openGallery(id) {
+            const p = PRODUCTS.find(x => x.id === id);
+            if (!p || !p.images || p.images.length === 0) return;
+            
+            galImages = p.images.filter(img => img && img.trim() !== "");
+            if (galImages.length === 0) return;
+            
+            galIdx = 0;
+            updateGal();
+            document.getElementById("gallery").classList.add("active");
+            document.body.style.overflow = "hidden";
+        }
+
+        function updateGal() {
+            if (!galImages.length) return;
+            document.getElementById("gal-img").src = galImages[galIdx];
+            document.getElementById("gal-counter").textContent = `${galIdx + 1} / ${galImages.length}`;
+            
+            const thumbs = document.getElementById("gal-thumbs");
+            thumbs.innerHTML = "";
+            galImages.forEach((src, i) => {
+                const img = document.createElement("img");
+                img.src = src;
+                img.onerror = function() { this.src = 'images/placeholder.jpg'; };
+                if (i === galIdx) img.classList.add("active");
+                img.onclick = () => { galIdx = i; updateGal(); };
+                thumbs.appendChild(img);
+            });
+        }
+
+        function navImg(d) {
+            if (!galImages.length) return;
+            galIdx = (galIdx + d + galImages.length) % galImages.length;
+            updateGal();
+        }
+
+        function closeGallery() { 
+            document.getElementById("gallery").classList.remove("active"); 
+            document.body.style.overflow = "auto";
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderCategoryFilters();
+            renderCatalog();
+        });
+
+        document.addEventListener("keydown", e => {
+            if (document.getElementById("gallery").classList.contains("active")) {
+                if (e.key === "Escape") closeGallery();
+                if (e.key === "ArrowLeft") navImg(-1);
+                if (e.key === "ArrowRight") navImg(1);
+            }
+        });
+    </script>
+</body>
+</html>
