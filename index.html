@@ -71,6 +71,13 @@
             font-size: 1.3rem; font-weight: bold; color: var(--success); 
             margin: 10px 0; 
         }
+        .card-stock {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 8px 0;
+        }
+        .card-stock.in-stock { color: var(--success); }
+        .card-stock.out-stock { color: var(--primary); }
         .card-actions { display: flex; gap: 8px; margin-top: auto; }
         .card-actions .btn { 
             flex: 1; padding: 10px; border: none; border-radius: 6px; 
@@ -128,7 +135,7 @@
 <body>
 
     <header>
-        <h1>🍳 Catálogo Cocina Premium</h1>
+        <h1>🍳 Catálogo de Cocina Premium</h1>
         <p>Explora nuestros productos y contáctanos por WhatsApp</p>
     </header>
 
@@ -147,34 +154,30 @@
     <script>
         // ==================== CONFIGURACIÓN (EDITAR AQUÍ) ====================
         const CONFIG = {
-            whatsapp: "7757076561", // ← TU NÚMERO DE WHATSAPP AQUÍ
+            whatsapp: "7757076561",
             activeCategories: [
-                "Ollas/Vaporeras", "Sartenes", "Vasos", "Vajillas", 
-                "Electrodomesticos", "Utensilios", "Cubiertos", "Accesorios"
+                "Ollas/Vaporeras", "Pocillos", "Teteras/Cafeteras", "Sartenes", 
+                "Cacerolas", "Baterias", "Copas", "Comales", "Arroceras", "Vasos", "Jarras", "Bomboneras"
             ]
         };
 
         // ==================== CATEGORÍAS DISPONIBLES ====================
         const CATEGORIES = [
             { id: "Ollas/Vaporeras", label: "🍲 Ollas/Vaporeras" },
+            { id: "Pocillos", label: "☕ Pocillos" },
+            { id: "Teteras/Cafeteras", label: "🫖 Teteras/Cafeteras" },
             { id: "Sartenes", label: "🍳 Sartenes" },
+            { id: "Cacerolas", label: "🥘 Cacerolas" },
+            { id: "Baterias", label: "🍲🥘🍳 Baterías de Cocina" },
+            { id: "Copas", label: "🍷 Copas" },
+            { id: "Comales", label: "🫓 Comales" },
+            { id: "Arroceras", label: "🍚 Arroceras" },
             { id: "Vasos", label: "🥛 Vasos" },
-            { id: "Vajillas", label: "🍽️ Vajillas" },
-            { id: "Electrodomesticos", label: "⚡ Electrodomésticos" },
-            { id: "Utensilios", label: "🔪 Utensilios" },
-            { id: "Cubiertos", label: "🍴 Cubiertos" },
-            { id: "Accesorios", label: "🎁 Accesorios" }
+            { id: "Jarras", label: "🍶🥛 Jarras" },
+            { id: "Bomboneras", label: "🍬✨ Bomboneras "}
         ];
 
-        // ==================== ✏️ ZONA DE EDICIÓN DE PRODUCTOS (1-100) ====================
-        // Para AGREGAR o EDITAR productos:
-        // 1. enabled: true = se muestra | false = se oculta
-        // 2. category: debe coincidir EXACTAMENTE con el 'id' de CATEGORIES (ej: "Ollas")
-        // 3. price: formato "999.99" (sin símbolo $)
-        // 4. images: rutas de imágenes en carpeta "images/"
-        //    Ej: "images/producto1-foto1.jpg"
-        // ============================================================================
-
+        // ==================== PRODUCTOS 1-100 (FORMATO VERTICAL) ====================
         const PRODUCTS = [
             {
                 id: "1",
@@ -182,20 +185,22 @@
                 category: "Ollas/Vaporeras",
                 name: "OLLA RECTA ALTA 22 CM CINSA",
                 price: "380.00",
+                stock: "200",
                 desc: "INCLUYE UNA TAPA DE CRISTAL, PERFCTTA PARA TUS COMIDAS.",
                 images: [
-                    "images/producto1-foto1.jpg",
-                    "images/producto1-foto2.jpg",
-                    "images/producto1-foto3.jpg",
-                    "images/producto1-foto4.jpg"
+                    "ollas/producto1-foto1.jpg",
+                    "ollas/producto1-foto2.jpg",
+                    "ollas/producto1-foto3.jpg",
+                    "ollas/producto1-foto4.jpg"
                 ]
             },
             {
                 id: "2",
-                enabled: false,
+                enabled: true,
                 category: "Sartenes",
                 name: "Sartén Antiadherente 28cm",
                 price: "459.00",
+                stock: "0",
                 desc: "Recubrimiento cerámico libre de PFOA. Apto para todo tipo de estufas.",
                 images: [
                     "images/producto2-foto1.jpg",
@@ -208,15 +213,17 @@
                 category: "Vasos",
                 name: "Juego de 6 Vasos de Cristal",
                 price: "299.00",
+                stock: "0",
                 desc: "Cristal templado resistente. Capacidad 350ml cada uno.",
                 images: ["images/producto3-foto1.jpg"]
             },
             {
                 id: "4",
                 enabled: false,
-                category: "Vajillas",
-                name: "Vajilla Porcelana 12 piezas",
+                category: "Jarras",
+                name: "Jarra de Porcelana 1.5L",
                 price: "1299.00",
+                stock: "0",
                 desc: "Elegante diseño blanco con detalles dorados. Apta para microondas.",
                 images: [
                     "images/producto4-foto1.jpg",
@@ -228,64 +235,71 @@
             {
                 id: "5",
                 enabled: false,
-                category: "Electrodomesticos",
-                name: "Licuadora Profesional 1200W",
+                category: "Teteras/Cafeteras",
+                name: "Cafetera Italiana 6 Tazas",
                 price: "1899.00",
-                desc: "Motor potente con 5 velocidades. Jarra de vidrio templado 2L.",
+                stock: "0",
+                desc: "Aluminio fundido, mango ergonómico. Café estilo tradicional.",
                 images: ["images/producto5-foto1.jpg", "images/producto5-foto2.jpg"]
             },
             {
                 id: "6",
                 enabled: false,
-                category: "Utensilios",
-                name: "Set de Cuchillos Chef 5 piezas",
+                category: "Pocillos",
+                name: "Set de 4 Pocillos de Cerámica",
                 price: "749.00",
-                desc: "Acero inoxidable de alta calidad. Incluye bloque de madera.",
+                stock: "0",
+                desc: "Cerámica esmaltada, diseño artesanal. Aptos para horno y microondas.",
                 images: ["images/producto6-foto1.jpg"]
             },
             {
                 id: "7",
                 enabled: false,
-                category: "Cubiertos",
-                name: "Cubertería Inoxidable 24 piezas",
+                category: "Copas",
+                name: "Juego de 6 Copas de Vino",
                 price: "599.00",
-                desc: "Acabado espejo. Incluye 6 tenedores, 6 cucharas, 6 cuchillos y 6 postres.",
+                stock: "0",
+                desc: "Cristal fino, diseño elegante. Capacidad 250ml cada una.",
                 images: ["images/producto7-foto1.jpg", "images/producto7-foto2.jpg"]
             },
             {
                 id: "8",
                 enabled: false,
-                category: "Accesorios",
-                name: "Delantal de Cocina Premium",
+                category: "Comales",
+                name: "Comal de Barro Tradicional",
                 price: "199.00",
-                desc: "Algodón resistente con bolsillos. Talla única ajustable.",
+                stock: "0",
+                desc: "Barro cocido artesanal. Ideal para tortillas y asados.",
                 images: ["images/producto8-foto1.jpg"]
             },
             {
                 id: "9",
                 enabled: false,
-                category: "Ollas",
-                name: "Olla Express 6L",
+                category: "Arroceras",
+                name: "Olla Arrocera 4L Antiadherente",
                 price: "1199.00",
-                desc: "Cocción rápida y segura. Válvula de seguridad certificada.",
+                stock: "0",
+                desc: "Recubrimiento antiadherente, tapa de vidrio. Cocción perfecta.",
                 images: ["images/producto9-foto1.jpg", "images/producto9-foto2.jpg", "images/producto9-foto3.jpg"]
             },
             {
                 id: "10",
                 enabled: false,
-                category: "Sartenes",
-                name: "Wok Antiadherente 32cm",
+                category: "Cacerolas",
+                name: "Cacerola Profunda 24cm",
                 price: "649.00",
-                desc: "Perfecto para salteados asiáticos. Mango ergonómico resistente al calor.",
+                stock: "0",
+                desc: "Acero inoxidable, fondo difusor. Apta para todo tipo de estufas.",
                 images: ["images/producto10-foto1.jpg", "images/producto10-foto2.jpg"]
             },
             {
                 id: "11",
                 enabled: false,
-                category: "cacerolas",
-                name: "pura cocina perrona",
-                price: "45555555.00",
-                desc: "No se mostrará",
+                category: "Baterias",
+                name: "Batería de Cocina 10 Piezas",
+                price: "4555.00",
+                stock: "0",
+                desc: "Set completo con ollas, sartenes y tapas. Acero inoxidable.",
                 images: []
             },
             {
@@ -294,78 +308,87 @@
                 category: "Vasos",
                 name: "Vaso Térmico 500ml",
                 price: "150.00",
-                desc: "Mantiene frío/calor por horas",
+                stock: "0",
+                desc: "Mantiene frío/calor por horas. Acero inoxidable doble pared.",
                 images: ["images/producto12-foto1.jpg"]
             },
             {
                 id: "13",
                 enabled: false,
-                category: "Vasos",
+                category: "Pocillos",
                 name: "Producto 13",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 13",
                 images: []
             },
             {
                 id: "14",
                 enabled: false,
-                category: "Vajillas",
+                category: "Teteras/Cafeteras",
                 name: "Producto 14",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 14",
                 images: []
             },
             {
                 id: "15",
                 enabled: false,
-                category: "Electrodomesticos",
+                category: "Sartenes",
                 name: "Producto 15",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 15",
                 images: []
             },
             {
                 id: "16",
                 enabled: false,
-                category: "Utensilios",
+                category: "Cacerolas",
                 name: "Producto 16",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 16",
                 images: []
             },
             {
                 id: "17",
                 enabled: false,
-                category: "Cubiertos",
+                category: "Baterias",
                 name: "Producto 17",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 17",
                 images: []
             },
             {
                 id: "18",
                 enabled: false,
-                category: "Accesorios",
+                category: "Copas",
                 name: "Producto 18",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 18",
                 images: []
             },
             {
                 id: "19",
                 enabled: false,
-                category: "Ollas",
+                category: "Comales",
                 name: "Producto 19",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 19",
                 images: []
             },
             {
                 id: "20",
                 enabled: false,
-                category: "Sartenes",
+                category: "Arroceras",
                 name: "Producto 20",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 20",
                 images: []
             },
@@ -375,636 +398,707 @@
                 category: "Vasos",
                 name: "Producto 21",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 21",
                 images: []
             },
             {
                 id: "22",
                 enabled: false,
-                category: "Vajillas",
+                category: "Jarras",
                 name: "Producto 22",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 22",
                 images: []
             },
             {
                 id: "23",
                 enabled: false,
-                category: "Electrodomesticos",
+                category: "Ollas/Vaporeras",
                 name: "Producto 23",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 23",
                 images: []
             },
             {
                 id: "24",
                 enabled: false,
-                category: "Utensilios",
+                category: "Pocillos",
                 name: "Producto 24",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 24",
                 images: []
             },
             {
                 id: "25",
                 enabled: false,
-                category: "Cubiertos",
+                category: "Teteras/Cafeteras",
                 name: "Producto 25",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 25",
                 images: []
             },
             {
                 id: "26",
                 enabled: false,
-                category: "Accesorios",
+                category: "Sartenes",
                 name: "Producto 26",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 26",
                 images: []
             },
             {
                 id: "27",
                 enabled: false,
-                category: "Ollas",
+                category: "Cacerolas",
                 name: "Producto 27",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 27",
                 images: []
             },
             {
                 id: "28",
                 enabled: false,
-                category: "Sartenes",
+                category: "Baterias",
                 name: "Producto 28",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 28",
                 images: []
             },
             {
                 id: "29",
                 enabled: false,
-                category: "Vasos",
+                category: "Copas",
                 name: "Producto 29",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 29",
                 images: []
             },
             {
                 id: "30",
                 enabled: false,
-                category: "Vajillas",
+                category: "Comales",
                 name: "Producto 30",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 30",
                 images: []
             },
             {
                 id: "31",
                 enabled: false,
-                category: "Electrodomesticos",
+                category: "Arroceras",
                 name: "Producto 31",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 31",
                 images: []
             },
             {
                 id: "32",
                 enabled: false,
-                category: "Utensilios",
+                category: "Vasos",
                 name: "Producto 32",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 32",
                 images: []
             },
             {
                 id: "33",
                 enabled: false,
-                category: "Cubiertos",
+                category: "Jarras",
                 name: "Producto 33",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 33",
                 images: []
             },
             {
                 id: "34",
                 enabled: false,
-                category: "Accesorios",
+                category: "Ollas/Vaporeras",
                 name: "Producto 34",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 34",
                 images: []
             },
             {
                 id: "35",
                 enabled: false,
-                category: "Ollas",
+                category: "Pocillos",
                 name: "Producto 35",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 35",
                 images: []
             },
             {
                 id: "36",
                 enabled: false,
-                category: "Sartenes",
+                category: "Teteras/Cafeteras",
                 name: "Producto 36",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 36",
                 images: []
             },
             {
                 id: "37",
                 enabled: false,
-                category: "Vasos",
+                category: "Sartenes",
                 name: "Producto 37",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 37",
                 images: []
             },
             {
                 id: "38",
                 enabled: false,
-                category: "Vajillas",
+                category: "Cacerolas",
                 name: "Producto 38",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 38",
                 images: []
             },
             {
                 id: "39",
                 enabled: false,
-                category: "Electrodomesticos",
+                category: "Baterias",
                 name: "Producto 39",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 39",
                 images: []
             },
             {
                 id: "40",
                 enabled: false,
-                category: "Utensilios",
+                category: "Copas",
                 name: "Producto 40",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 40",
                 images: []
             },
             {
                 id: "41",
                 enabled: false,
-                category: "Cubiertos",
+                category: "Comales",
                 name: "Producto 41",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 41",
                 images: []
             },
             {
                 id: "42",
                 enabled: false,
-                category: "Accesorios",
+                category: "Arroceras",
                 name: "Producto 42",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 42",
                 images: []
             },
             {
                 id: "43",
                 enabled: false,
-                category: "Ollas",
+                category: "Vasos",
                 name: "Producto 43",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 43",
                 images: []
             },
             {
                 id: "44",
                 enabled: false,
-                category: "Sartenes",
+                category: "Jarras",
                 name: "Producto 44",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 44",
                 images: []
             },
             {
                 id: "45",
                 enabled: false,
-                category: "Vasos",
+                category: "Ollas/Vaporeras",
                 name: "Producto 45",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 45",
                 images: []
             },
             {
                 id: "46",
                 enabled: false,
-                category: "Vajillas",
+                category: "Pocillos",
                 name: "Producto 46",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 46",
                 images: []
             },
             {
                 id: "47",
                 enabled: false,
-                category: "Electrodomesticos",
+                category: "Teteras/Cafeteras",
                 name: "Producto 47",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 47",
                 images: []
             },
             {
                 id: "48",
                 enabled: false,
-                category: "Utensilios",
+                category: "Sartenes",
                 name: "Producto 48",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 48",
                 images: []
             },
             {
                 id: "49",
                 enabled: false,
-                category: "Cubiertos",
+                category: "Cacerolas",
                 name: "Producto 49",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 49",
                 images: []
             },
             {
                 id: "50",
                 enabled: false,
-                category: "Accesorios",
+                category: "Baterias",
                 name: "Producto 50",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 50",
                 images: []
             },
             {
                 id: "51",
                 enabled: false,
-                category: "Ollas",
+                category: "Copas",
                 name: "Producto 51",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 51",
                 images: []
             },
             {
                 id: "52",
                 enabled: false,
-                category: "Sartenes",
+                category: "Comales",
                 name: "Producto 52",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 52",
                 images: []
             },
             {
                 id: "53",
                 enabled: false,
-                category: "Vasos",
+                category: "Arroceras",
                 name: "Producto 53",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 53",
                 images: []
             },
             {
                 id: "54",
                 enabled: false,
-                category: "Vajillas",
+                category: "Vasos",
                 name: "Producto 54",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 54",
                 images: []
             },
             {
                 id: "55",
                 enabled: false,
-                category: "Electrodomesticos",
+                category: "Jarras",
                 name: "Producto 55",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 55",
                 images: []
             },
             {
                 id: "56",
                 enabled: false,
-                category: "Utensilios",
+                category: "Ollas/Vaporeras",
                 name: "Producto 56",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 56",
                 images: []
             },
             {
                 id: "57",
                 enabled: false,
-                category: "Cubiertos",
+                category: "Pocillos",
                 name: "Producto 57",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 57",
                 images: []
             },
             {
                 id: "58",
                 enabled: false,
-                category: "Accesorios",
+                category: "Teteras/Cafeteras",
                 name: "Producto 58",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 58",
                 images: []
             },
             {
                 id: "59",
                 enabled: false,
-                category: "Ollas",
+                category: "Sartenes",
                 name: "Producto 59",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 59",
                 images: []
             },
             {
                 id: "60",
                 enabled: false,
-                category: "Sartenes",
+                category: "Cacerolas",
                 name: "Producto 60",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 60",
                 images: []
             },
             {
                 id: "61",
                 enabled: false,
-                category: "Vasos",
+                category: "Baterias",
                 name: "Producto 61",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 61",
                 images: []
             },
             {
                 id: "62",
                 enabled: false,
-                category: "Vajillas",
+                category: "Copas",
                 name: "Producto 62",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 62",
                 images: []
             },
             {
                 id: "63",
                 enabled: false,
-                category: "Electrodomesticos",
+                category: "Comales",
                 name: "Producto 63",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 63",
                 images: []
             },
             {
                 id: "64",
                 enabled: false,
-                category: "Utensilios",
+                category: "Arroceras",
                 name: "Producto 64",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 64",
                 images: []
             },
             {
                 id: "65",
                 enabled: false,
-                category: "Cubiertos",
+                category: "Vasos",
                 name: "Producto 65",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 65",
                 images: []
             },
             {
                 id: "66",
                 enabled: false,
-                category: "Accesorios",
+                category: "Jarras",
                 name: "Producto 66",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 66",
                 images: []
             },
             {
                 id: "67",
                 enabled: false,
-                category: "Ollas",
+                category: "Ollas/Vaporeras",
                 name: "Producto 67",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 67",
                 images: []
             },
             {
                 id: "68",
                 enabled: false,
-                category: "Sartenes",
+                category: "Pocillos",
                 name: "Producto 68",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 68",
                 images: []
             },
             {
                 id: "69",
                 enabled: false,
-                category: "Vasos",
+                category: "Teteras/Cafeteras",
                 name: "Producto 69",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 69",
                 images: []
             },
             {
                 id: "70",
                 enabled: false,
-                category: "Vajillas",
+                category: "Sartenes",
                 name: "Producto 70",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 70",
                 images: []
             },
             {
                 id: "71",
                 enabled: false,
-                category: "Electrodomesticos",
+                category: "Cacerolas",
                 name: "Producto 71",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 71",
                 images: []
             },
             {
                 id: "72",
                 enabled: false,
-                category: "Utensilios",
+                category: "Baterias",
                 name: "Producto 72",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 72",
                 images: []
             },
             {
                 id: "73",
                 enabled: false,
-                category: "Cubiertos",
+                category: "Copas",
                 name: "Producto 73",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 73",
                 images: []
             },
             {
                 id: "74",
                 enabled: false,
-                category: "Accesorios",
+                category: "Comales",
                 name: "Producto 74",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 74",
                 images: []
             },
             {
                 id: "75",
                 enabled: false,
-                category: "Ollas",
+                category: "Arroceras",
                 name: "Producto 75",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 75",
                 images: []
             },
             {
                 id: "76",
                 enabled: false,
-                category: "Sartenes",
+                category: "Vasos",
                 name: "Producto 76",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 76",
                 images: []
             },
             {
                 id: "77",
                 enabled: false,
-                category: "Vasos",
+                category: "Jarras",
                 name: "Producto 77",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 77",
                 images: []
             },
             {
                 id: "78",
                 enabled: false,
-                category: "Vajillas",
+                category: "Ollas/Vaporeras",
                 name: "Producto 78",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 78",
                 images: []
             },
             {
                 id: "79",
                 enabled: false,
-                category: "Electrodomesticos",
+                category: "Pocillos",
                 name: "Producto 79",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 79",
                 images: []
             },
             {
                 id: "80",
                 enabled: false,
-                category: "Utensilios",
+                category: "Teteras/Cafeteras",
                 name: "Producto 80",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 80",
                 images: []
             },
             {
                 id: "81",
                 enabled: false,
-                category: "Cubiertos",
+                category: "Sartenes",
                 name: "Producto 81",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 81",
                 images: []
             },
             {
                 id: "82",
                 enabled: false,
-                category: "Accesorios",
+                category: "Cacerolas",
                 name: "Producto 82",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 82",
                 images: []
             },
             {
                 id: "83",
                 enabled: false,
-                category: "Ollas",
+                category: "Baterias",
                 name: "Producto 83",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 83",
                 images: []
             },
             {
                 id: "84",
                 enabled: false,
-                category: "Sartenes",
+                category: "Copas",
                 name: "Producto 84",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 84",
                 images: []
             },
             {
                 id: "85",
                 enabled: false,
-                category: "Vasos",
+                category: "Comales",
                 name: "Producto 85",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 85",
                 images: []
             },
             {
                 id: "86",
                 enabled: false,
-                category: "Vajillas",
+                category: "Arroceras",
                 name: "Producto 86",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 86",
                 images: []
             },
             {
                 id: "87",
                 enabled: false,
-                category: "Electrodomesticos",
+                category: "Vasos",
                 name: "Producto 87",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 87",
                 images: []
             },
             {
                 id: "88",
                 enabled: false,
-                category: "Utensilios",
+                category: "Jarras",
                 name: "Producto 88",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 88",
                 images: []
             },
             {
                 id: "89",
                 enabled: false,
-                category: "Cubiertos",
+                category: "Ollas/Vaporeras",
                 name: "Producto 89",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 89",
                 images: []
             },
             {
                 id: "90",
                 enabled: false,
-                category: "Accesorios",
+                category: "Pocillos",
                 name: "Producto 90",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 90",
                 images: []
             },
             {
                 id: "91",
                 enabled: false,
-                category: "Ollas",
+                category: "Teteras/Cafeteras",
                 name: "Producto 91",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 91",
                 images: []
             },
@@ -1014,78 +1108,87 @@
                 category: "Sartenes",
                 name: "Producto 92",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 92",
                 images: []
             },
             {
                 id: "93",
                 enabled: false,
-                category: "Vasos",
+                category: "Cacerolas",
                 name: "Producto 93",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 93",
                 images: []
             },
             {
                 id: "94",
                 enabled: false,
-                category: "Vajillas",
+                category: "Baterias",
                 name: "Producto 94",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 94",
                 images: []
             },
             {
                 id: "95",
                 enabled: false,
-                category: "Electrodomesticos",
+                category: "Copas",
                 name: "Producto 95",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 95",
                 images: []
             },
             {
                 id: "96",
                 enabled: false,
-                category: "Utensilios",
+                category: "Comales",
                 name: "Producto 96",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 96",
                 images: []
             },
             {
                 id: "97",
                 enabled: false,
-                category: "Cubiertos",
+                category: "Arroceras",
                 name: "Producto 97",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 97",
                 images: []
             },
             {
                 id: "98",
                 enabled: false,
-                category: "Accesorios",
+                category: "Vasos",
                 name: "Producto 98",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 98",
                 images: []
             },
             {
                 id: "99",
                 enabled: false,
-                category: "Ollas",
+                category: "Jarras",
                 name: "Producto 99",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 99",
                 images: []
             },
             {
                 id: "100",
                 enabled: false,
-                category: "Sartenes",
+                category: "Ollas/Vaporeras",
                 name: "Producto 100",
                 price: "0.00",
+                stock: "0",
                 desc: "Descripción del producto 100",
                 images: []
             }
@@ -1147,6 +1250,17 @@
                 let imgs = (p.images || []).filter(img => img && img.trim() !== "");
                 if (imgs.length === 0) imgs = ["images/placeholder.jpg"];
                 
+                // Determinar clase y texto de stock
+                let stockHTML = "";
+                if (p.stock !== undefined && p.stock !== null && p.stock !== "") {
+                    const stockNum = Number(p.stock);
+                    if (stockNum > 0) {
+                        stockHTML = `<div class="card-stock in-stock">📦 ${stockNum} disponibles</div>`;
+                    } else if (stockNum === 0) {
+                        stockHTML = `<div class="card-stock out-stock">❌ Agotado</div>`;
+                    }
+                }
+                
                 cont.innerHTML += `
                     <div class="card">
                         <div class="card-img-wrap" onclick="openGallery('${p.id}')">
@@ -1158,6 +1272,7 @@
                             <div style="font-weight:600; margin-bottom:5px;">${p.name || 'Sin nombre'}</div>
                             <div style="font-size:0.9rem; color:#666; flex:1;">${p.desc || ""}</div>
                             <div class="card-price">$${Number(p.price || 0).toFixed(2)}</div>
+                            ${stockHTML}
                             <div class="card-actions">
                                 <button class="btn btn-success" onclick="contactWA('${(p.name || 'Producto').replace(/'/g, "\\'")}', '${p.price || '0'}')">📲 Consultar por WhatsApp</button>
                             </div>
@@ -1226,5 +1341,28 @@
             }
         });
     </script>
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyDjP7u-K3NkGxNpxCs7cGjcaCVphfl6vEo",
+    authDomain: "utensilios-de-cocina-ed5b6.firebaseapp.com",
+    projectId: "utensilios-de-cocina-ed5b6",
+    storageBucket: "utensilios-de-cocina-ed5b6.firebasestorage.app",
+    messagingSenderId: "213246459990",
+    appId: "1:213246459990:web:4c265c8b49cf6174f5bbf7",
+    measurementId: "G-V1RC9FNV9D"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 </body>
 </html>
